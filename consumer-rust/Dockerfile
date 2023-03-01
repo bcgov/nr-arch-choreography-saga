@@ -17,4 +17,5 @@ FROM scratch
 COPY --from=build /usr/src/app/target/x86_64-unknown-linux-musl/release/app .
 EXPOSE 3000
 USER 1000
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
 CMD ["./app"]
