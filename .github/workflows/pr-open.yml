@@ -24,10 +24,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           add_markdown: |
             ---
-
             Thanks for the PR!
-
-
             Once merged, code will be promoted and handed off to following workflow run.
             [Main Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge-main.yml)
 
@@ -42,18 +39,33 @@ jobs:
         include:
           - package: consumer-node
             triggers: ('consumer-node/')
+            build_file: ./consumer-node/Dockerfile
+            build_context: ./consumer-node
           - package: consumer-rust
             triggers: ('consumer-rust/')
+            build_file: ./consumer-rust/Dockerfile
+            build_context: ./consumer-rust
           - package: database
             triggers: ('database/')
+            build_file: ./database/Dockerfile
+            build_context: ./database
           - package: consumer-go
             triggers: ('consumer-go/')
+            build_file: ./consumer-go/Dockerfile
+            build_context: ./consumer-go
           - package: publisher-java-api
             triggers: ('publisher-java-api/')
+            build_file: ./publisher-java-api/Dockerfile
+            build_context: ./publisher-java-api
           - package: frontend-api
             triggers: ('frontend/api')
+            build_file: ./frontend/api/Dockerfile
+            build_context: ./frontend/api
           - package: frontend-static
             triggers: ('frontend/static')
+            build_file: ./frontend/static/Dockerfile
+            build_context: ./frontend/static
+
     steps:
       - uses: actions/checkout@v3
       - uses: bcgov-nr/action-builder-ghcr@v1.1.0
@@ -63,6 +75,8 @@ jobs:
           tag_fallback: test
           token: ${{ secrets.GITHUB_TOKEN }}
           triggers: ${{ matrix.triggers }}
+          build_file: ${{ matrix.build_file }}
+          build_context: ${{ matrix.build_context }}
 
   deploys:
     name: Deploys
