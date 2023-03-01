@@ -1,28 +1,26 @@
-FROM registry.access.redhat.com/ubi8/ubi:8.7 AS builder
-RUN dnf module install -y nodejs:18
-
+FROM openjdk:17 as build
 WORKDIR /app
 COPY . ./
-RUN npm ci --omit=dev
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package -DskipTests -Dtests.skip=true -Dskip.unit.tests=true
 
-# Deployment container
-FROM node:lts-alpine
+FROM eclipse-temurin:17-jdk-alpine
+LABEL maintainer="Paulo Gomes da Cruz Junior <paulo.cruz@encora.com>"
 
-# Set node to production
-ENV NODE_ENV production
-
-# Copy over app
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src ./src
 
-# Expose port - mostly a convention, for readability
-EXPOSE 3000
+ENV LANG en_CA.UTF-8
+ENV LANGUAGE en_CA.UTF-8
+ENV LC_ALL en_CA.UTF-8
+ENV JAVA_OPS -Xms512m -Xmx512m
+
+COPY --from=build /app/target/publisher*.jar /app/service.jar
+
+
+EXPOSE 3001
+
+HEALTHCHECK --interval=35s --timeout=4s CMD wget --spider -S http://127.0.0.1:3001/health || exit 1
 
 # Non-privileged user
-RUN adduser -D app
 USER app
-
-# Start up command
-HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
-ENTRYPOINT ["node", "src/server"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom -jar /app/service.jar"]

@@ -6,10 +6,10 @@ labels:
 parameters:
   - name: NAME
     description: Module name
-    value: public-code
+    value: nr-arch-choreography-saga
   - name: COMPONENT
     description: Component name
-    value: backend
+    value: consumer-node
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -40,7 +40,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/public-code/backend:test
+    value: bcgov/nr-arch-choreography-saga/consumer-node:test
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -91,28 +91,9 @@ objects:
               imagePullPolicy: Always
               name: ${NAME}
               env:
-                - name: DB_HOST
-                  value: ${NAME}-${ZONE}-database
-                - name: DB_PWD
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-admin-password
-                - name: DB_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-admin-user
-                - name: DB_NAME
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-name
-                - name: API_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-backend
-                      key: api_key
+                - name: NATS_URL
+                  value: nats://nats:4222
+
               ports:
                 - containerPort: 3000
                   protocol: TCP

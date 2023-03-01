@@ -9,7 +9,7 @@ parameters:
     value: nr-arch-choreography-saga
   - name: COMPONENT
     description: Component name
-    value: consumer-rust
+    value: consumer-go
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -40,7 +40,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/nr-arch-choreography-saga/consumer-rust:test
+    value: bcgov/nr-arch-choreography-saga/consumer-go:test
 objects:
   - apiVersion: v1
     kind: ImageStream

@@ -9,7 +9,7 @@ parameters:
     value: nr-arch-choreography-saga
   - name: COMPONENT
     description: Component name
-    value: consumer-rust
+    value: frontend-api
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -40,7 +40,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/nr-arch-choreography-saga/consumer-rust:test
+    value: bcgov/nr-arch-choreography-saga/frontend-api:test
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -93,6 +93,7 @@ objects:
               env:
                 - name: NATS_URL
                   value: nats://nats:4222
+
               ports:
                 - containerPort: 3000
                   protocol: TCP
@@ -105,7 +106,7 @@ objects:
                   memory: ${MEMORY_LIMIT}
               readinessProbe:
                 httpGet:
-                  path: /api/pub-code/health
+                  path: /
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 10
@@ -116,7 +117,7 @@ objects:
                 successThreshold: 1
                 failureThreshold: 5
                 httpGet:
-                  path: /api/pub-code/health
+                  path: /
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 60

@@ -2,11 +2,6 @@ use actix_web::{get, post, App, HttpServer};
 use cloudevents::{Event, EventBuilder, EventBuilderV10};
 use serde_json::json;
 use std::{env, str::from_utf8};
-#[post("/")]
-async fn post_event(event: Event) -> Event {
-  println!("Received Event: {:?}", event);
-  event
-}
 
 #[get("/")]
 async fn get_event() -> Event {
