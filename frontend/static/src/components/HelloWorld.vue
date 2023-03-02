@@ -12,7 +12,7 @@ defineProps<{
   <v-container class="fill-height">
     <v-responsive class="d-flex align-center text-center fill-height">
       <v-img
-        src="@/assets/logo.svg"
+        src="@/assets/bc-gov-logo.svg"
         alt="vuetify"
         :width="256"
         class="logo mx-auto"
