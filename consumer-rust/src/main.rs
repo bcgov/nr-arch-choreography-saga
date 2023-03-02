@@ -1,7 +1,7 @@
-use actix_web::{get, post, App, HttpServer};
+use actix_web::{get, App, HttpServer};
 use cloudevents::{Event, EventBuilder, EventBuilderV10};
 use serde_json::json;
-use std::{env, str::from_utf8};
+use std::{env};
 
 #[get("/")]
 async fn get_event() -> Event {
@@ -22,12 +22,12 @@ async fn main() -> std::io::Result<()> {
   std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
   env_logger::init();
   let nats_url = env::var("NATS_URL").unwrap_or_else(|_| "nats://localhost:4222".to_string());
+  println!("NATS_URL: {}", nats_url);
 
   HttpServer::new(|| {
     App::new()
       .wrap(actix_cors::Cors::permissive())
       .wrap(actix_web::middleware::Logger::default())
-      .service(post_event)
       .service(get_event)
   })
     .bind("127.0.0.1:3000")?

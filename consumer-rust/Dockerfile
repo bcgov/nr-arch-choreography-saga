@@ -1,21 +1,22 @@
-FROM rust:1.67 AS build
+FROM rust:1.67-alpine AS build
 WORKDIR /usr/src
-RUN rustup target add x86_64-unknown-linux-musl
+RUN apk add --no-cache musl-dev
 
 # Download and compile Rust dependencies (and store as a separate Docker layer)
 RUN USER=root cargo new app
 WORKDIR /usr/src/app
 COPY Cargo.toml Cargo.lock ./
-RUN cargo install --target x86_64-unknown-linux-musl --path .
+RUN cargo install --path .
 
 # Build our application
 COPY src ./src
-RUN cargo build --release --target x86_64-unknown-linux-musl
+RUN cargo build --release
 
 # Copy into a scratch (no-op) container, only copying the binary
-FROM scratch
-COPY --from=build /usr/src/app/target/x86_64-unknown-linux-musl/release/app .
+FROM alpine:latest
+RUN apk add --no-cache libgcc
+COPY --from=build /usr/src/app/target/release/app /usr/local/bin/app
 EXPOSE 3000
 USER 1000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
-CMD ["./app"]
+CMD ["app"]
