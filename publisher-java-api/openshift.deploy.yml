@@ -6,10 +6,10 @@ labels:
 parameters:
   - name: NAME
     description: Module name
-    value: public-code
+    value: nr-arch-choreography-saga
   - name: COMPONENT
     description: Component name
-    value: backend
+    value: publisher-java-api
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -40,7 +40,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/public-code/backend:test
+    value: bcgov/nr-arch-choreography-saga/publisher-java-api:test
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -97,22 +97,17 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
-                      key: database-admin-password
+                      key: database-password
                 - name: DB_USER
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
-                      key: database-admin-user
+                      key: database-user
                 - name: DB_NAME
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
                       key: database-name
-                - name: API_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-backend
-                      key: api_key
               ports:
                 - containerPort: 3000
                   protocol: TCP
@@ -125,7 +120,7 @@ objects:
                   memory: ${MEMORY_LIMIT}
               readinessProbe:
                 httpGet:
-                  path: /api/pub-code/health
+                  path: /actuator/health
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 10
@@ -136,7 +131,7 @@ objects:
                 successThreshold: 1
                 failureThreshold: 5
                 httpGet:
-                  path: /api/pub-code/health
+                  path: /actuator/health
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 60
