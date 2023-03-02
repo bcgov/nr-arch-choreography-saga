@@ -15,8 +15,8 @@ RUN cargo build --release
 # Copy into a scratch (no-op) container, only copying the binary
 FROM alpine:latest
 RUN apk add --no-cache libgcc
-COPY --from=build /usr/src/app/target/release/app /usr/local/bin/app
+COPY --from=build /usr/src/app/target/release/consumer_rust /usr/local/bin/consumer_rust
 EXPOSE 3000
 USER 1000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
-CMD ["app"]
+CMD ["consumer_rust"]
