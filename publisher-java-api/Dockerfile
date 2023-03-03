@@ -1,11 +1,10 @@
 FROM openjdk:17 as build
 WORKDIR /app
 COPY . ./
-RUN chmod +x ./mvnw
-RUN ./mvnw clean package -DskipTests -Dtests.skip=true -Dskip.unit.tests=true
+#RUN chmod +x ./mvnw
+#RUN ./mvnw clean package -DskipTests -Dtests.skip=true -Dskip.unit.tests=true
 
 FROM eclipse-temurin:17-jdk-alpine
-LABEL maintainer="Paulo Gomes da Cruz Junior <paulo.cruz@encora.com>"
 
 WORKDIR /app
 
@@ -22,5 +21,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=35s --timeout=4s CMD wget --spider -S http://127.0.0.1:3001/health || exit 1
 
 # Non-privileged user
-USER app
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom -jar /app/service.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/service.jar"]
