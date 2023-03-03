@@ -38,7 +38,7 @@ func main() {
 		sysLog.Fatalf("Error: %v", err)
 		return
 	}
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 	nc, err := nats.Connect(os.Getenv("NATS_URL"))

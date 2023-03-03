@@ -91,14 +91,16 @@ objects:
               imagePullPolicy: Always
               name: ${NAME}
               env:
+                - name: NATS_URL
+                  value: nats://nats:4222
                 - name: DB_HOST
                   value: ${NAME}-${ZONE}-database
-                - name: DB_PWD
+                - name: DB_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
                       key: database-password
-                - name: DB_USER
+                - name: DB_USERNAME
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
