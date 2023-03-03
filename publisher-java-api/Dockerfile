@@ -1,8 +1,8 @@
 FROM openjdk:17 as build
 WORKDIR /app
 COPY . ./
-#RUN chmod +x ./mvnw
-#RUN ./mvnw clean package -DskipTests -Dtests.skip=true -Dskip.unit.tests=true
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package -DskipTests -Dtests.skip=true -Dskip.unit.tests=true
 
 FROM eclipse-temurin:17-jdk-alpine
 
