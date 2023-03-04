@@ -33,14 +33,15 @@ func main() {
 		TimeFormat: "2006-01-02T15:04:05",
 		TimeZone:   "GMT",
 	}))
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 	err := app.Listen(":3000")
 	if err != nil {
 		sysLog.Fatalf("Error: %v", err)
 		return
 	}
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+
 	nc, err := nats.Connect(os.Getenv("NATS_URL"))
 	js, _ := nc.JetStream()
 	js.QueueSubscribe("EVENTS", "CONSUMER-GO", handler, nats.Durable("CONSUMER-GO"))
