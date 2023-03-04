@@ -8,7 +8,7 @@ const natsOptions = {
   url: nats_url,
   servers: [nats_url],
   maxReconnectAttempts: 24,
-  name: 'consumer-node',
+  name: 'consumer-frontend-api',
   reconnectTimeWait: 5000, // wait 5 seconds before retrying...
   waitOnFirstConnect: true,
   pingInterval: 2000,
