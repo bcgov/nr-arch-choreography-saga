@@ -33,7 +33,7 @@ func main() {
 		TimeFormat: "2006-01-02T15:04:05",
 		TimeZone:   "GMT",
 	}))
-	app.Get("/health", func(c *fiber.Ctx) error {
+	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 	err := app.Listen(":3000")

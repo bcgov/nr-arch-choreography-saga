@@ -14,5 +14,5 @@ RUN addgroup -S appgroup && adduser -S 1001 -G appgroup
 USER 1001
 COPY --chown=1001 --from=build ${DEPENDENCY}/app /usr/local/bin/app
 EXPOSE 3000
-HEALTHCHECK --interval=300s --timeout=3s CMD curl -f http://127.0.0.1/:3000/health
+HEALTHCHECK --interval=300s --timeout=3s CMD curl -f http://127.0.0.1/:3000
 ENTRYPOINT  ["app"]
