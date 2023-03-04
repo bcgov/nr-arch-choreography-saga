@@ -21,4 +21,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=35s --timeout=4s CMD wget --spider -S http://127.0.0.1:3001/health || exit 1
 
 # Non-privileged user
+USER app
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/service.jar"]

@@ -13,7 +13,7 @@ COPY src ./src
 RUN cargo build --release
 
 # Copy into a scratch (no-op) container, only copying the binary
-FROM alpine:latest
+FROM alpine:3.9.6
 RUN apk add --no-cache libgcc
 COPY --from=build /usr/src/app/target/release/consumer_rust /usr/local/bin/consumer_rust
 EXPOSE 3000
