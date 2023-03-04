@@ -19,19 +19,23 @@ async fn get_event() -> Event {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-  std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
+  env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
   env_logger::init();
+  log::info!("starting HTTP server at http://localhost:3000");
   let nats_url = env::var("NATS_URL").unwrap_or_else(|_| "nats://localhost:4222".to_string());
   println!("NATS_URL: {}", nats_url);
 
-  HttpServer::new(|| {
+
+  const RESULT: Result<(), E> = HttpServer::new(|| {
     App::new()
       .wrap(actix_cors::Cors::permissive())
       .wrap(actix_web::middleware::Logger::default())
       .service(get_event)
   })
-    .bind(":3000")?
-    .workers(1)?
-    .run()?
-    .await
+    .bind(("127.0.0.1", 3000))?
+    .workers(1)
+    .run()
+    .await;
+  log::info!("started HTTP server at http://localhost:3000");
+  return RESULT;
 }
