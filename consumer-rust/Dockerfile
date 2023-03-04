@@ -1,5 +1,6 @@
 # Using the `rust-musl-builder` as base image, instead of
 # the official Rust toolchain
+#https://github.com/LukeMathWalker/cargo-chef
 FROM clux/muslrust:stable AS chef
 USER root
 RUN cargo install cargo-chef

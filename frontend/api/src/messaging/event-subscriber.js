@@ -25,10 +25,11 @@ const subscribe = () => {
 
     const opts = consumerOpts();
     opts.name="consumer-frontend-api";
+    opts.queue="consumer-frontend-api-queue";
     opts.durable("consumer-frontend-api-durable");
     opts.manualAck();
     opts.ackExplicit();
-    opts.deliverTo(createInbox());
+    opts.deliverTo(createInbox("consumer-frontend-api"));
     opts.deliver_policy=process.env.DELIVER_POLICY || DeliverPolicy.New;
     opts.callback(handleJetStreamMessage);
     opts.stream="EVENTS";

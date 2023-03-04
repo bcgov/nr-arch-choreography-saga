@@ -25,10 +25,11 @@ const subscribe = () => {
 
     const opts = consumerOpts();
     opts.name="consumer-node-api";
+    opts.queue="consumer-node-api-queue";
     opts.durable("consumer-node-durable");
     opts.manualAck();
     opts.ackExplicit();
-    opts.deliverTo(createInbox());
+    opts.deliverTo(createInbox("consumer-node-api"));
     opts.deliver_policy=process.env.DELIVER_POLICY || DeliverPolicy.New;
     opts.callback(handleJetStreamMessage);
     opts.stream="EVENTS";
