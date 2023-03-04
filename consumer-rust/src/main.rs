@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
       .wrap(actix_web::middleware::Logger::default())
       .service(get_event)
   })
-    .bind(("127.0.0.1", 3000))?
+    .bind(("0.0.0.0", 3000))?
     .workers(1)
     .run()
     .await
