@@ -2,7 +2,7 @@ import asyncio
 import nest_asyncio
 from fastapi import FastAPI
 
-from messaging.messagehandler import MessageHandler
+from app.messaging.messagehandler import MessageHandler
 
 app = FastAPI(title="Consumer Python", version="0.0.1")
 jsMsgHandler = MessageHandler("EVENTS-TOPIC", "consumer-python", "consumer-python")
