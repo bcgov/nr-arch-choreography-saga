@@ -68,14 +68,14 @@ async fn main() -> std::io::Result<()> {
   tokio::spawn(async {
     handle_jet_stream_message().await;
   });
-
+  let port: u16 = env::var("PORT").unwrap_or_else(|_| 3000.to_string()).parse().unwrap();
   HttpServer::new(|| {
     App::new()
       .wrap(actix_cors::Cors::permissive())
       .wrap(actix_web::middleware::Logger::default())
       .service(get_event)
   })
-    .bind(("0.0.0.0", 3010))?
+    .bind(("0.0.0.0", port))?
     .workers(1)
     .run()
     .await

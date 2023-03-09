@@ -40,21 +40,6 @@ const subscribe = () => {
         m.ack();
       }
     })();
-
-    /*const consumerOpts = {
-      config: {
-        name: 'consumer-node-api',
-        durable_name: 'consumer-node-api',
-        ack_policy: AckPolicy.Explicit,
-        deliver_policy: DeliverPolicy.New,
-        deliver_subject: 'consumer-node-api'
-      },
-      mack: true,
-      queue: 'consumer-node-api-queue-group',
-      stream: 'EVENTS',
-      callbackFn: handleJetStreamMessage,
-    };
-    await jetStream.subscribe(key, consumerOpts);*/
   });
 
 };
