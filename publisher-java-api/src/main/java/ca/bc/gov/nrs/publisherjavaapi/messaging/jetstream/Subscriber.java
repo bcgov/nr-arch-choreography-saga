@@ -6,6 +6,7 @@ import io.nats.client.Connection;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Message;
 import io.nats.client.PushSubscribeOptions;
+import io.nats.client.api.AckPolicy;
 import io.nats.client.api.ConsumerConfiguration;
 import io.nats.client.api.DeliverPolicy;
 import jakarta.annotation.PostConstruct;
@@ -30,7 +31,7 @@ public class Subscriber {
   /**
    * Instantiates a new Subscriber.
    *
-   * @param natsConnection          the nats connection
+   * @param natsConnection the nats connection
    */
   @Autowired
   public Subscriber(final Connection natsConnection) {
@@ -48,10 +49,15 @@ public class Subscriber {
   public void subscribe() throws IOException, JetStreamApiException {
     val qName = "EVENTS-TOPIC-PUBLISHER-API";
     val autoAck = false;
-    PushSubscribeOptions options = PushSubscribeOptions.builder().stream(ApplicationProperties.STREAM_NAME)
+    PushSubscribeOptions options = PushSubscribeOptions.builder()
+      .stream(ApplicationProperties.STREAM_NAME)
+      .name("EVENTS-TOPIC-PUBLISHER-API")
+      .deliverSubject("EVENTS-TOPIC-PUBLISHER-API")
       .durable("EVENTS-TOPIC-PUBLISHER-API")
-      .configuration(ConsumerConfiguration.builder().deliverPolicy(DeliverPolicy.New).build()).build();
-    this.natsConnection.jetStream().subscribe("EVENTS_TOPIC", qName, this.natsConnection.createDispatcher(), this::onEventsTopicMessage,
+      .configuration(ConsumerConfiguration.builder()
+        .deliverPolicy(DeliverPolicy.New).ackPolicy(AckPolicy.Explicit)
+        .build()).build();
+    this.natsConnection.jetStream().subscribe("EVENTS-TOPIC", qName, this.natsConnection.createDispatcher(), this::onEventsTopicMessage,
       autoAck, options);
   }
 
@@ -70,6 +76,7 @@ public class Subscriber {
       ChoreographedEvent event = JsonUtil.getJsonObjectFromString(ChoreographedEvent.class, eventString);
       jetStreamEventHandlerService.updateEventStatus(event);
       log.info("received event :: {} ", event); */
+      log.info("received event :: {} ", eventString);
       message.ack();
     } catch (final Exception ex) {
       log.error("Exception ", ex);

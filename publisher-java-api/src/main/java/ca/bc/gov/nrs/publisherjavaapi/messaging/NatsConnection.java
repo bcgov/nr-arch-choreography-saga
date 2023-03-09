@@ -40,7 +40,7 @@ public class NatsConnection implements Closeable {
     io.nats.client.Options natsOptions = new io.nats.client.Options.Builder()
       .connectionListener(this::connectionListener)
       .maxPingsOut(5)
-      .pingInterval(Duration.ofSeconds(2))
+      .pingInterval(Duration.ofSeconds(120))
       .connectionName("PUBLISHER-API")
       .connectionTimeout(Duration.ofSeconds(5))
       .maxReconnects(maxReconnects)

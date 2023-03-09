@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
@@ -36,17 +37,36 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
-	err := app.Listen(":3000")
+	nc, err := nats.Connect(os.Getenv("NATS_URL"))
 	if err != nil {
 		sysLog.Fatalf("Error: %v", err)
-		return
+		os.Exit(127)
+	}
+	js, _ := nc.JetStream()
+	_, subErr := js.QueueSubscribe("EVENTS-TOPIC", "CONSUMER-GO", handler, nats.Durable("CONSUMER-GO"))
+	if subErr != nil {
+		sysLog.Fatalf("Error: %v", subErr)
+		os.Exit(127)
+	}
+	//convert to number from string
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "3000"
+	}
+	var port = fmt.Sprintf(":%s", PORT)
+	fmt.Println(port)
+	appErr := app.Listen(port)
+	if appErr != nil {
+		sysLog.Fatalf("Error: %v", appErr)
+		os.Exit(127)
 	}
 
-	nc, err := nats.Connect(os.Getenv("NATS_URL"))
-	js, _ := nc.JetStream()
-	js.QueueSubscribe("EVENTS", "CONSUMER-GO", handler, nats.Durable("CONSUMER-GO"))
 }
 
 func handler(msg *nats.Msg) {
-	sysLog.Printf("Received a message: %s	", string(msg.Data))
+	var meta, _ = msg.Metadata()
+
+	var message = fmt.Sprintf("Received a message: seq[%d], pending[%d], data[%s]", meta.Sequence, meta.NumPending, string(msg.Data))
+
+	fmt.Println(message)
 }

@@ -1,5 +1,5 @@
 ---
-version: "3.8"
+version: "3.9"
 
 services:
   database:
@@ -12,51 +12,37 @@ services:
       POSTGRES_DB: default
     hostname: database
     restart: always
+    ports:
+      - "5432:5432"
     user: postgres
     volumes:
       - /pgdata
 
-  backend:
-    container_name: backend
-    entrypoint:
-      - "sh"
-      - "-c"
-      - "npm i && npm run start"
-    environment:
-      NODE_ENV: development
-      POSTGRESQL_HOST: database
-      POSTGRESQL_USER: postgres
-      POSTGRESQL_PASSWORD: default
-      POSTGRESQL_DATABASE: default
-    hostname: backend
-    image: registry.access.redhat.com/ubi8/nodejs-18-minimal
-    links:
-      - database
+  nats:
+    image: nats:2.9-alpine
+    container_name: nats
+    hostname: nats
+    restart: always
+    command:
+      - "-js"
+      - "-DVV"
     ports:
-      - "3001:3000"
-    volumes:
-      - ./backend:/app:z
-      - /app/node_modules
-    user: root
-    working_dir: "/app"
-
-  frontend:
-    container_name: frontend
-    entrypoint:
-      - "sh"
-      - "-c"
-      - "chown -R root . && npm ci && npm run dev"
-    environment:
-      NODE_ENV: development
-      BACKEND_URL: backend
-    hostname: frontend
-    image: registry.access.redhat.com/ubi8/nodejs-18-minimal
-    links:
-      - backend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app:z
-      - /app/node_modules
-    user: root
-    working_dir: "/app"
+      - "4222:4222"
+      - "8222:8222"
+      - "6222:6222"
+    networks:
+      - saga
+  nats-box:
+    image: natsio/nats-box:latest
+    container_name: nats-box
+    hostname: nats-box
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    depends_on:
+      - nats
+    networks:
+      - saga
+networks:
+  saga:
+    driver: bridge
