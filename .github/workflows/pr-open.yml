@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [consumer-go, consumer-node,consumer-rust, database, init, frontend-api,frontend-static,publisher-java-api]
+        name: [consumer-go, consumer-node,consumer-rust, database, init, frontend-api,frontend-static,publisher-java-api,consumer-python]
         include:
           - name: consumer-go
             file: consumer-go/openshift.deploy.yml
