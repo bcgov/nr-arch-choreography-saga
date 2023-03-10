@@ -11,13 +11,13 @@ const handleJetStreamMessage = async (err, msg) => {
     return;
   }
   try {
-  const data = JSON.parse(StringCodec().decode(msg.data)); // it would always be a JSON string. ii will always be choreographed event.
-  logger.info(`Received message, on ${msg.subject} , Sequence ::  [${msg.seq}], sid ::  [${msg.sid}], redelivered ::  [${msg.redelivered}] :: Data ::`, data);
-  logger.info(data);
+    const data = JSON.parse(StringCodec().decode(msg.data)); // it would always be a JSON string. ii will always be choreographed event.
+    logger.info(`Received message, on ${msg.subject} , Sequence ::  [${msg.seq}], sid ::  [${msg.sid}], redelivered ::  [${msg.redelivered}] :: Data ::`, data);
+    logger.info(data);
 
     msg.ack(); // acknowledge to JetStream
   } catch (e) {
-    logger.error('Error while handling student data from update student event', e);
+    logger.error('Error while handling data from event', e);
     msg.ack(); // acknowledge to JetStream
   }
 };
@@ -25,11 +25,19 @@ const handleJetStreamMessage = async (err, msg) => {
 const subscribe = () => {
   const jetStream = NATS.getConnection().jetstream();
   TOPICS.forEach(async (key) => {
-
-    const opts = consumerOpts();
-    opts.durable("consumer-node-api");
+    const config = {
+      deliver_policy: DeliverPolicy.New,
+      ack_policy: AckPolicy.Explicit,
+      deliver_group: 'consumer-node-api',
+      name: 'consumer-node-api'
+    };
+    const opts = consumerOpts(config);
+    opts.stream='EVENTS';
+    opts.durable('consumer-node-api');
     opts.manualAck();
     opts.ackExplicit();
+    opts.deliverNew();
+    opts.deliverGroup('consumer-node-api');
     opts.deliverTo(createInbox('consumer-node-api'));
 
     let sub = await jetStream.subscribe(key, opts);

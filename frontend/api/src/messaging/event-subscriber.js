@@ -2,7 +2,7 @@
 const TOPICS = ['EVENTS-TOPIC'];
 const logger = require('../logger');
 const NATS = require('./nats-con');
-const {StringCodec, createInbox, consumerOpts} = require('nats');
+const {StringCodec, createInbox, consumerOpts, AckPolicy, DeliverPolicy} = require('nats');
 
 
 const handleJetStreamMessage = async (err, msg) => {
@@ -17,7 +17,7 @@ const handleJetStreamMessage = async (err, msg) => {
 
     msg.ack(); // acknowledge to JetStream
   } catch (e) {
-    logger.error('Error while handling student data from update student event', e);
+    logger.error('Error while handling data from event', e);
     msg.ack(); // acknowledge to JetStream
   }
 };
@@ -25,11 +25,19 @@ const handleJetStreamMessage = async (err, msg) => {
 const subscribe = () => {
   const jetStream = NATS.getConnection().jetstream();
   TOPICS.forEach(async (key) => {
-
-    const opts = consumerOpts();
-    opts.durable("consumer-frontend-api-durable");
+    const config = {
+      deliver_policy: DeliverPolicy.New,
+      ack_policy: AckPolicy.Explicit,
+      deliver_group: 'consumer-frontend-api',
+      name: 'consumer-frontend-api'
+    };
+    const opts = consumerOpts(config);
+    opts.stream='EVENTS';
+    opts.durable('consumer-frontend-api');
     opts.manualAck();
     opts.ackExplicit();
+    opts.deliverNew();
+    opts.deliverGroup('consumer-frontend-api');
     opts.deliverTo(createInbox('consumer-frontend-api'));
 
     let sub = await jetStream.subscribe(key, opts);
