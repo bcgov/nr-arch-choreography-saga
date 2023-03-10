@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "consumer-python"
+version = "0.1.0"
+description = ""
+authors = ["OMPRAKASH MISHRA <omprakashmishra3978@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "consumer_python" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.93.0"
+uvicorn = "^0.20.0"
+nats-py = "^2.2.0"
+nest-asyncio = "^1.5.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
