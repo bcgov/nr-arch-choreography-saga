@@ -37,24 +37,22 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
-	nc, err := nats.Connect(os.Getenv("NATS_URL"))
+	nc, err := nats.Connect(getEnv("NATS_URL", "nats://localhost:4222"))
 	if err != nil {
 		sysLog.Fatalf("Error: %v", err)
 		os.Exit(127)
 	}
 	js, _ := nc.JetStream()
 	_, subErr := js.QueueSubscribe("EVENTS-TOPIC", "CONSUMER-GO", handler, nats.Durable("CONSUMER-GO"))
+
 	if subErr != nil {
 		sysLog.Fatalf("Error: %v", subErr)
 		os.Exit(127)
 	}
+	HandleSubscriptionForExternalAPIAndNotifyUsingHttp(nc)
 	//convert to number from string
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
-		PORT = "3000"
-	}
+	PORT := getEnv("PORT", "3000")
 	var port = fmt.Sprintf(":%s", PORT)
-	fmt.Println(port)
 	appErr := app.Listen(port)
 	if appErr != nil {
 		sysLog.Fatalf("Error: %v", appErr)
@@ -69,4 +67,11 @@ func handler(msg *nats.Msg) {
 	var message = fmt.Sprintf("Received a message: seq[%d], pending[%d], data[%s]", meta.Sequence, meta.NumPending, string(msg.Data))
 
 	fmt.Println(message)
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }

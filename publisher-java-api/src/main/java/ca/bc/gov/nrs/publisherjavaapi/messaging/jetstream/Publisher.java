@@ -4,6 +4,7 @@ import ca.bc.gov.nrs.publisherjavaapi.properties.ApplicationProperties;
 import io.nats.client.Connection;
 import io.nats.client.JetStream;
 import io.nats.client.JetStreamApiException;
+import io.nats.client.api.PublishAck;
 import io.nats.client.api.StreamConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -53,6 +54,9 @@ public class Publisher {
       }
     }
 
+  }
+  public PublishAck publish(final String message) throws JetStreamApiException, IOException {
+    return this.jetStream.publish("EVENTS-TOPIC", message.getBytes());
   }
 }
 

@@ -1,7 +1,9 @@
 package ca.bc.gov.nrs.publisherjavaapi.messaging.jetstream;
 
 
+import ca.bc.gov.nrs.publisherjavaapi.model.Event;
 import ca.bc.gov.nrs.publisherjavaapi.properties.ApplicationProperties;
+import ca.bc.gov.nrs.publisherjavaapi.util.JsonUtil;
 import io.nats.client.Connection;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Message;
@@ -72,11 +74,8 @@ public class Subscriber {
     log.info("Received message Subject:: {} , SID :: {} , sequence :: {}, pending :: {} ", message.getSubject(), message.getSID(), message.metaData().consumerSequence(), message.metaData().pendingCount());
     try {
       val eventString = new String(message.getData());
-      /*LogHelper.logMessagingEventDetails(eventString);
-      ChoreographedEvent event = JsonUtil.getJsonObjectFromString(ChoreographedEvent.class, eventString);
-      jetStreamEventHandlerService.updateEventStatus(event);
-      log.info("received event :: {} ", event); */
-      log.info("received event :: {} ", eventString);
+      val event = JsonUtil.getJsonObjectFromString(Event.class, eventString);
+      log.info("received event :: {} ", event);
       message.ack();
     } catch (final Exception ex) {
       log.error("Exception ", ex);
