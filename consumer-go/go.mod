@@ -7,6 +7,8 @@ require (
 	github.com/gofiber/helmet/v2 v2.2.24
 	github.com/joho/godotenv v1.4.0
 	github.com/nats-io/nats.go v1.23.0
+	github.com/sirupsen/logrus v1.9.0
+	github.com/valyala/fasthttp v1.44.0
 )
 
 require (
@@ -26,7 +28,6 @@ require (
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.44.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect

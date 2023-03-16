@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/nats-io/nats.go"
+	"github.com/sirupsen/logrus"
 	"github.com/valyala/fasthttp"
 	"os"
 )
@@ -11,7 +12,7 @@ func HandleSubscriptionForExternalAPIAndNotifyUsingHttp(nc *nats.Conn) {
 	js, _ := nc.JetStream()
 	_, subErr := js.QueueSubscribe(getEnv("EXTERNAL_CONSUMER_TOPIC", "EVENTS-TOPIC"), getEnv("EXTERNAL_CONSUMER_Q_NAME", "external_consumer"), externalConsumerMessageHandler, nats.Durable(getEnv("EXTERNAL_CONSUMER_NAME", "external_consumer")))
 	if subErr != nil {
-		sysLog.Fatalf("Error: %v", subErr)
+		logrus.Fatalf("Error: %v", subErr)
 		os.Exit(127)
 	}
 }
@@ -29,10 +30,14 @@ func externalConsumerMessageHandler(msg *nats.Msg) {
 	req.Header.SetContentType("application/json")
 	req.Header.Add("X_API_KEY", getEnv("EXTERNAL_CONSUMER_API_KEY", "API_KEY"))
 	req.SetBody(msg.Data)
-	client := &fasthttp.Client{}
-	client.Do(req, res)
-	bodyBytes := res.Body()
-	fmt.Println(string(bodyBytes))
 
-	fmt.Println(message)
+	err := client.Do(req, res)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+	bodyBytes := res.Body()
+	logrus.Info(string(bodyBytes))
+
+	logrus.Info(message)
 }

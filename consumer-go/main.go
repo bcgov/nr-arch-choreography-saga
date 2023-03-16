@@ -12,17 +12,23 @@ import (
 	"github.com/gofiber/helmet/v2"
 	"github.com/joho/godotenv"
 	"github.com/nats-io/nats.go"
-	"log"
+	"github.com/sirupsen/logrus"
+	"github.com/valyala/fasthttp"
 	"os"
+	"time"
 )
 
 var (
 	buf    bytes.Buffer
-	sysLog = log.New(&buf, "log: ", log.Llongfile)
+	client *fasthttp.Client = nil
 )
 
 func main() {
 	_ = godotenv.Load()
+	logrus.SetFormatter(&logrus.TextFormatter{
+		ForceColors: true,
+	})
+	logrus.SetLevel(logrus.DebugLevel)
 	app := fiber.New(fiber.Config{})
 	app.Use(helmet.New())
 	app.Use(favicon.New())
@@ -37,16 +43,17 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
+	getHttpClient() // initialize http client
 	nc, err := nats.Connect(getEnv("NATS_URL", "nats://localhost:4222"))
 	if err != nil {
-		sysLog.Fatalf("Error: %v", err)
+		logrus.Fatalf("Error: %v", err)
 		os.Exit(127)
 	}
 	js, _ := nc.JetStream()
 	_, subErr := js.QueueSubscribe("EVENTS-TOPIC", "CONSUMER-GO", handler, nats.Durable("CONSUMER-GO"))
 
 	if subErr != nil {
-		sysLog.Fatalf("Error: %v", subErr)
+		logrus.Fatalf("Error: %v", subErr)
 		os.Exit(127)
 	}
 	HandleSubscriptionForExternalAPIAndNotifyUsingHttp(nc)
@@ -55,7 +62,7 @@ func main() {
 	var port = fmt.Sprintf(":%s", PORT)
 	appErr := app.Listen(port)
 	if appErr != nil {
-		sysLog.Fatalf("Error: %v", appErr)
+		logrus.Fatalf("Error: %v", appErr)
 		os.Exit(127)
 	}
 
@@ -66,7 +73,7 @@ func handler(msg *nats.Msg) {
 
 	var message = fmt.Sprintf("Received a message: seq[%d], pending[%d], data[%s]", meta.Sequence, meta.NumPending, string(msg.Data))
 
-	fmt.Println(message)
+	logrus.Info(message)
 }
 
 func getEnv(key, fallback string) string {
@@ -74,4 +81,14 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func getHttpClient() *fasthttp.Client {
+	if client != nil {
+		return client
+	}
+	duration := 30 * time.Second
+
+	client = &fasthttp.Client{NoDefaultUserAgentHeader: true, MaxConnWaitTimeout: duration, MaxConnsPerHost: 1000, MaxIdleConnDuration: 1000, MaxIdemponentCallAttempts: 1000, ReadTimeout: duration, WriteBufferSize: 1000, WriteTimeout: duration, MaxConnDuration: duration}
+	return client
 }
