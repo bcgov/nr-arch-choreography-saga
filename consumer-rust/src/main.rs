@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
   HttpServer::new(|| {
     App::new()
       .wrap(actix_cors::Cors::permissive())
-      .wrap(actix_web::middleware::Logger::default())
+      .wrap(actix_web::middleware::Logger::default().exclude("/").exclude("/favicon.ico"))
       .service(get_event)
   })
     .bind(("0.0.0.0", port))?

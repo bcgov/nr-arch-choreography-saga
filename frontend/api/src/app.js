@@ -32,13 +32,14 @@ app.use(bodyParser.urlencoded({
   extended: true,
   limit: "50mb"
 }));
+app.get("/", (req, res, next) => {
+  res.sendStatus(200);// generally for route verification.
+});
 app.use(morgan("dev", { stream: logStream }));
 const resourcePath = path.resolve(__dirname, '../build');
 // Setting express static
 app.use(express.static(resourcePath));
-app.get("/", (req, res, next) => {
-  res.sendStatus(200);// generally for route verification.
-});
+
 app.use(/(\/api)?/, apiRouter);
 
 module.exports = app;

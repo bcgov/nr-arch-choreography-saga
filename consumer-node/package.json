@@ -1,7 +1,7 @@
 {
-  "name": "publisher-api",
+  "name": "consumer-node-api",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

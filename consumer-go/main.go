@@ -35,14 +35,13 @@ func main() {
 	app.Use(recover.New())
 	app.Use(cors.New())
 	app.Use(csrf.New())
-
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 	app.Use(logger.New(logger.Config{
 		TimeFormat: "2006-01-02T15:04:05",
 		TimeZone:   "GMT",
 	}))
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
 	getHttpClient() // initialize http client
 	nc, err := nats.Connect(getEnv("NATS_URL", "nats://localhost:4222"))
 	if err != nil {
