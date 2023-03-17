@@ -37,6 +37,5 @@ app.get("/", (req, res, next) => {
 app.use(morgan("dev", { stream: logStream }));
 
 app.use(/(\/api)?/, apiRouter);
-apiRouter.use("/test", require("./test-router"));
 
 module.exports = app;
