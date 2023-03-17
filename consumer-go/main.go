@@ -48,13 +48,6 @@ func main() {
 		logrus.Fatalf("Error: %v", err)
 		os.Exit(127)
 	}
-	js, _ := nc.JetStream()
-	_, subErr := js.QueueSubscribe("EVENTS-TOPIC", "CONSUMER-GO", handler, nats.Durable("CONSUMER-GO"))
-
-	if subErr != nil {
-		logrus.Fatalf("Error: %v", subErr)
-		os.Exit(127)
-	}
 	HandleSubscriptionForExternalAPIAndNotifyUsingHttp(nc)
 	//convert to number from string
 	PORT := getEnv("PORT", "3000")
@@ -65,14 +58,6 @@ func main() {
 		os.Exit(127)
 	}
 
-}
-
-func handler(msg *nats.Msg) {
-	var meta, _ = msg.Metadata()
-
-	var message = fmt.Sprintf("Received a message: seq[%d], pending[%d], data[%s]", meta.Sequence, meta.NumPending, string(msg.Data))
-
-	logrus.Info(message)
 }
 
 func getEnv(key, fallback string) string {
