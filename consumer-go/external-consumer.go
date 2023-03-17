@@ -60,6 +60,9 @@ func externalConsumerMessageHandler(msg *nats.Msg) {
 	if err != nil {
 		logrus.Error(err)
 		return
+	} else if res.StatusCode() != 200 {
+		logrus.Error("External API returned non 200 status code", res.StatusCode())
+		return
 	}
 	bodyBytes := res.Body()
 	logrus.Info(string(bodyBytes))
