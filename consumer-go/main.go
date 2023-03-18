@@ -26,7 +26,8 @@ var (
 func main() {
 	_ = godotenv.Load()
 	logrus.SetFormatter(&logrus.TextFormatter{
-		ForceColors: true,
+		ForceColors:   true,
+		FullTimestamp: true,
 	})
 	logrus.SetLevel(logrus.DebugLevel)
 	app := fiber.New(fiber.Config{})

@@ -40,12 +40,16 @@ func HandleSubscriptionForExternalAPIAndNotifyUsingHttp(nc *nats.Conn) {
 	}
 	_, subErr := js.QueueSubscribe("EVENTS-TOPIC", getEnv("EXTERNAL_CONSUMER_NAME", "external_consumer"), externalConsumerMessageHandler, nats.Bind("EVENTS", getEnv("EXTERNAL_CONSUMER_NAME", "external_consumer")))
 
+	freshInfo, err := js.ConsumerInfo("EVENTS", getEnv("EXTERNAL_CONSUMER_NAME", "external_consumer"))
+	logrus.Infof("Consumer Info: %+v", freshInfo)
 	if subErr != nil {
 		logrus.Fatalf("Error: %v", subErr)
 		os.Exit(127)
 	}
 }
 func externalConsumerMessageHandler(msg *nats.Msg) {
+	meta, _ := msg.Metadata()
+	logrus.Infof("received message: Data[%s], Sequence[%d], NumPending[%d], NumDelivered[%d], Timestamp[%s]", string(msg.Data), meta.Sequence, meta.NumPending, meta.NumDelivered, meta.Timestamp)
 	req := fasthttp.AcquireRequest()
 	res := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -59,9 +63,11 @@ func externalConsumerMessageHandler(msg *nats.Msg) {
 	err := client.Do(req, res)
 	if err != nil {
 		logrus.Error(err)
+		msg.NakWithDelay(60 * time.Second)
 		return
 	} else if res.StatusCode() != 200 {
 		logrus.Error("External API returned non 200 status code", res.StatusCode())
+		msg.NakWithDelay(60 * time.Second)
 		return
 	}
 	bodyBytes := res.Body()
