@@ -3,16 +3,23 @@ package ca.bc.gov.nrs.publisherjavaapi;
 import ca.bc.gov.nrs.publisherjavaapi.messaging.jetstream.Publisher;
 import ca.bc.gov.nrs.publisherjavaapi.model.Permit;
 import ca.bc.gov.nrs.publisherjavaapi.service.PermitService;
+import ca.bc.gov.nrs.publisherjavaapi.service.SearchService;
 import ca.bc.gov.nrs.publisherjavaapi.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.JetStreamApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,6 +28,9 @@ import java.util.UUID;
 public class PermitController {
   private final PermitService permitService;
   private final Publisher publisher;
+
+  private final SearchService searchService;
+  public static final ObjectMapper mapper = new ObjectMapper();
 
   @PostMapping
   public PermitDTO createPermit(@Validated @RequestBody PermitDTO permitDTO) throws JetStreamApiException, IOException {
@@ -36,6 +46,19 @@ public class PermitController {
     publisher.publish(JsonUtil.getJsonStringFromObject(permitPair.getSecond()));
     var permit = permitPair.getFirst();
     return PermitDTO.toDTO(permit);
+  }
+
+  @GetMapping("/paginated")
+  public ResponseEntity<?> getPermits(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                      @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                      @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson) throws IOException {
+    if (pageSize > 2000) {
+      return ResponseEntity.badRequest().body("Page size cannot be greater than 2000");
+    }
+    final List<Sort.Order> sorts = new ArrayList<>();
+    var specification = searchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, mapper, sorts);
+    return ResponseEntity.ok(permitService.getPermits(specification, pageNumber, pageSize, sorts));
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)

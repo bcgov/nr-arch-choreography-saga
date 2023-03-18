@@ -9,10 +9,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -56,5 +63,10 @@ public class PermitService {
     eventEntity.setPayloadVersion("1");
     eventEntity.setData(JsonUtil.getJsonStringFromObject(savedEntity));
     return eventEntity;
+  }
+
+  public Page<Permit> getPermits(Specification<Permit> permitSpecification, Integer pageNumber, Integer pageSize, final List<Sort.Order> sorts) {
+    Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
+    return permitRepo.findAll(permitSpecification, paging);
   }
 }
