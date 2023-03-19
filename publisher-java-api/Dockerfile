@@ -9,7 +9,7 @@ COPY src src
 
 RUN chmod +x mvnw
 
-RUN mvnw -Pnative-image package
+RUN ./mvnw -Pnative-image package
 
 FROM alpine:3.14
 WORKDIR /app
