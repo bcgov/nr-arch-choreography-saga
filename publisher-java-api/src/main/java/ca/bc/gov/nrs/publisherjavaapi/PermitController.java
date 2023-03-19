@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.JetStreamApiException;
+import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +54,7 @@ public class PermitController {
   public ResponseEntity<?> getPermits(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                       @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
-                                      @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson) throws IOException {
+                                      @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson) {
     if (pageSize > 2000) {
       return ResponseEntity.badRequest().body("Page size cannot be greater than 2000");
     }
@@ -63,7 +65,7 @@ public class PermitController {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy) {
+  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
     public static Permit toPermit(PermitDTO permitDTO) {
       Permit permit = new Permit();
@@ -76,7 +78,7 @@ public class PermitController {
     }
 
     public static PermitDTO toDTO(Permit permit) {
-      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy());
+      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy(), permit.getCreatedAt(), permit.getUpdatedAt());
     }
   }
 }

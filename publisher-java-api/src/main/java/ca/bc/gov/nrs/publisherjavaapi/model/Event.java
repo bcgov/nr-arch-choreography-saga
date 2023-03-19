@@ -13,6 +13,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity(name = "event")
@@ -36,4 +37,10 @@ public class Event {
   private String subject;
   String createdBy;
   String updatedBy;
+  @Column(name = "created_at")
+  LocalDateTime createdAt;
+
+  @Column(name = "updated_at")
+  LocalDateTime updatedAt;
+
 }

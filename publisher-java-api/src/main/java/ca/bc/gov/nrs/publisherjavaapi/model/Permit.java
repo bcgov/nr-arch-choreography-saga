@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.postgresql.geometric.PGpolygon;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity(name = "permit")
@@ -25,5 +26,10 @@ public class Permit {
   String permitArea;
   String createdBy;
   String updatedBy;
+  @Column(name = "created_at")
+  LocalDateTime createdAt;
+
+  @Column(name = "updated_at")
+  LocalDateTime updatedAt;
 
 }
