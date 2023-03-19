@@ -97,6 +97,8 @@ jobs:
           native-image-job-reports: 'true'
       - name: Build App
         run: |
+          PWD
+          ls -lrt
           chmod +x ./mvnw
           ./mvnw -Pnative clean spring-boot:build-image \
           -Dspring-boot.build-image.imageName="bcgov/nr-arch-choreography-saga/publisher-java-api" \
