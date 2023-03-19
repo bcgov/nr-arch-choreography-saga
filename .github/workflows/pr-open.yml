@@ -79,8 +79,11 @@ jobs:
           build_file: ${{ matrix.build_file }}
           build_context: ${{ matrix.build_context }}
   build-java:
-    name: Builds
+    name: Build Java
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: publisher-java-api
     permissions:
       packages: write
     steps:
