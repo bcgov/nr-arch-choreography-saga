@@ -94,7 +94,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
       - name: Build App
-        working-directory: ./publisher-java-api
+        working-directory: publisher-java-api
         run: |
           
           ls -lrt
