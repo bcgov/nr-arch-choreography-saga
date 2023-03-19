@@ -94,8 +94,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
       - name: Build App
+        working-directory: ./publisher-java-api
         run: |
-          PWD
+          
           ls -lrt
           chmod +x ./mvnw
           ./mvnw -Pnative clean spring-boot:build-image \
