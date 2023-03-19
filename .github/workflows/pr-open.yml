@@ -81,9 +81,7 @@ jobs:
   build-java:
     name: Build Java
     runs-on: ubuntu-22.04
-    defaults:
-      run:
-        working-directory: 'publisher-java-api'
+    
     permissions:
       packages: write
     steps:
