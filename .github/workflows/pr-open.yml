@@ -35,7 +35,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [consumer-go,consumer-rust,consumer-node, database, publisher-java-api,frontend-api, frontend-static,consumer-python]
+        package: [consumer-go,consumer-rust,consumer-node, database, frontend-api, frontend-static,consumer-python]
         include:
           - package: consumer-node
             triggers: ('consumer-node/')
@@ -53,10 +53,7 @@ jobs:
             triggers: ('consumer-go/')
             build_file: ./consumer-go/Dockerfile
             build_context: ./consumer-go
-          - package: publisher-java-api
-            triggers: ('publisher-java-api/')
-            build_file: ./publisher-java-api/Dockerfile
-            build_context: ./publisher-java-api
+
           - package: frontend-api
             triggers: ('frontend/api')
             build_file: ./frontend/api/Dockerfile
@@ -81,11 +78,41 @@ jobs:
           triggers: ${{ matrix.triggers }}
           build_file: ${{ matrix.build_file }}
           build_context: ${{ matrix.build_context }}
+  build-java:
+    name: Builds
+    runs-on: ubuntu-22.04
+    permissions:
+      packages: write
+    steps:
 
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+      - name: Build App
+        run: |
+          chmod +x ./mvnw
+          ./mvnw -Pnative clean spring-boot:build-image \
+          -Dspring-boot.build-image.imageName="bcgov/nr-arch-choreography-saga/publisher-java-api" \
+          -Doci.revision=${{ github.event.number }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pushing
+        run: docker push bcgov/nr-arch-choreography-saga/publisher-java-api:${{ github.event.number }}
   deploys:
     name: Deploys
     needs:
       - builds
+      - build-java
     runs-on: ubuntu-22.04
     strategy:
       matrix:
