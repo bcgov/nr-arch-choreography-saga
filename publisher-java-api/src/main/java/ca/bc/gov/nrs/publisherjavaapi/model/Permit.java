@@ -31,5 +31,7 @@ public class Permit {
 
   @Column(name = "updated_at")
   LocalDateTime updatedAt;
+  @Column(name = "permit_lat_long")
+  String permitLatLong;
 
 }

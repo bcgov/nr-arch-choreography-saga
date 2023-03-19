@@ -68,7 +68,7 @@ public class PermitController {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
+  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt, String permitLatLong) {
 
     public static Permit toPermit(PermitDTO permitDTO) {
       Permit permit = new Permit();
@@ -77,11 +77,13 @@ public class PermitController {
       permit.setPermitArea(permitDTO.permitArea());
       permit.setCreatedBy(permitDTO.createdBy());
       permit.setUpdatedBy(permitDTO.updatedBy());
+      permit.setPermitLatLong(permitDTO.permitLatLong());
       return permit;
     }
 
+
     public static PermitDTO toDTO(Permit permit) {
-      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy(), permit.getCreatedAt(), permit.getUpdatedAt());
+      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy(), permit.getCreatedAt(), permit.getUpdatedAt(), permit.getPermitLatLong());
     }
   }
 }
