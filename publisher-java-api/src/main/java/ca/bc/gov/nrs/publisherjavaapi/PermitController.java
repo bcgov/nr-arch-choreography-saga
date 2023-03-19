@@ -9,12 +9,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.JetStreamApiException;
-import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +35,7 @@ public class PermitController {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   @PostMapping
+  @Transactional
   public PermitDTO createPermit(@Validated @RequestBody PermitDTO permitDTO) throws JetStreamApiException, IOException {
     var permitPair = permitService.createPermit(PermitDTO.toPermit(permitDTO));
     publisher.publish(JsonUtil.getJsonStringFromObject(permitPair.getSecond()));
@@ -43,6 +44,7 @@ public class PermitController {
   }
 
   @PutMapping
+  @Transactional
   public PermitDTO updatePermit(@Validated @RequestBody PermitDTO permitDTO) throws IOException, JetStreamApiException {
     val permitPair = permitService.updatePermit(PermitDTO.toPermit(permitDTO));
     publisher.publish(JsonUtil.getJsonStringFromObject(permitPair.getSecond()));
@@ -51,6 +53,7 @@ public class PermitController {
   }
 
   @GetMapping("/paginated")
+  @Transactional(readOnly = true, propagation = Propagation.REQUIRED, timeout = 30) //timeout in seconds
   public ResponseEntity<?> getPermits(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                       @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
