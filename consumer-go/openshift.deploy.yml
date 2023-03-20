@@ -93,6 +93,12 @@ objects:
               env:
                 - name: NATS_URL
                   value: nats://nats:4222
+                - name: EXTERNAL_CONSUMER_API_URL
+                  value: placeholder
+                - name: EXTERNAL_CONSUMER_API_KEY_NAME
+                  value: placeholder
+                - name: EXTERNAL_CONSUMER_API_KEY_VALUE
+                  value: placeholder
               ports:
                 - containerPort: 3000
                   protocol: TCP
