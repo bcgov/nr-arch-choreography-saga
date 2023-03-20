@@ -15,6 +15,7 @@
   <description>Demo project for Spring Boot</description>
   <properties>
     <java.version>17</java.version>
+    <timestamp>${maven.build.timestamp}</timestamp>
   </properties>
   <dependencies>
     <dependency>
@@ -85,6 +86,24 @@
               <artifactId>lombok</artifactId>
             </exclude>
           </excludes>
+          <image>
+            <buildpacks>
+              <buildpack>gcr.io/paketo-buildpacks/graalvm</buildpack>
+              <buildpack>gcr.io/paketo-buildpacks/java-native-image</buildpack>
+              <buildpack>gcr.io/paketo-buildpacks/image-labels</buildpack>
+            </buildpacks>
+            <env>
+              <BP_JVM_VERSION>17.0.6</BP_JVM_VERSION>
+              <BP_OCI_SOURCE>https://github.com/bcgov/nr-arch-choreography-saga/</BP_OCI_SOURCE>
+              <BP_OCI_VERSION>${project.version}</BP_OCI_VERSION>
+              <BP_OCI_DESCRIPTION>${project.description}</BP_OCI_DESCRIPTION>
+              <BP_OCI_LICENSES>Apache License, Version 2.0</BP_OCI_LICENSES>
+              <BP_OCI_REVISION>${project.version}</BP_OCI_REVISION>
+              <BP_OCI_TITLE>${project.name}</BP_OCI_TITLE>
+              <BP_OCI_CREATED>${timestamp}</BP_OCI_CREATED>
+              <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+            </env>
+          </image>
         </configuration>
       </plugin>
     </plugins>
