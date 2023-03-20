@@ -81,7 +81,8 @@ jobs:
   build-java:
     name: Build Java
     runs-on: ubuntu-22.04
-
+    env:
+     NAME: ghcr.io/${{ github.repository }}/publisher-java-api:${{ github.event.number }}
     permissions:
       packages: write
     steps:
@@ -101,7 +102,7 @@ jobs:
           ls -lrt
           chmod +x ./mvnw
           ./mvnw -Pnative clean spring-boot:build-image -DskipTests \
-          -Dspring-boot.build-image.imageName="bcgov/nr-arch-choreography-saga/publisher-java-api" \
+          -Dspring-boot.build-image.imageName="${{ env.NAME }}" \
           -Doci.revision=${{ github.event.number }}
 
       - name: Log in to the Container registry
@@ -112,7 +113,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pushing
-        run: docker push bcgov/nr-arch-choreography-saga/publisher-java-api:${{ github.event.number }}
+        run: docker push ${{ env.NAME }}
   deploys:
     name: Deploys
     needs:
