@@ -1,21 +1,25 @@
-FROM ghcr.io/graalvm/graalvm-ce:22.3.0 AS build
-WORKDIR /workspace/app
-
-
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
-
-RUN chmod +x mvnw
-
-RUN ./mvnw -Pnative-image package
-
-FROM alpine:3.14
+FROM openjdk:17 as build
 WORKDIR /app
-COPY --from=build /workspace/app/target/ca.bc.gov.nrs.publisherjavaapi.publisherapiapplication /app/application
+COPY . ./
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package -DskipTests -Dtests.skip=true -Dskip.unit.tests=true
+
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+ENV LANG en_CA.UTF-8
+ENV LANGUAGE en_CA.UTF-8
+ENV LC_ALL en_CA.UTF-8
+ENV JAVA_OPS -Xms512m -Xmx512m
+
+COPY --from=build /app/target/publisher*.jar /app/service.jar
+
+
 EXPOSE 3000
 
-HEALTHCHECK --interval=300s --timeout=4s CMD wget --spider -S http://127.0.0.1:3000/actuator/health || exit 1
+HEALTHCHECK --interval=9000s --timeout=4s CMD wget --spider -S http://127.0.0.1:3000/health || exit 1
+
+# Non-privileged user
 USER app
-ENTRYPOINT ["/app/application"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/service.jar"]
