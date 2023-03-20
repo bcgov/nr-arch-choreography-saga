@@ -87,11 +87,6 @@
             </exclude>
           </excludes>
           <image>
-            <buildpacks>
-              <buildpack>gcr.io/paketo-buildpacks/graalvm</buildpack>
-              <buildpack>gcr.io/paketo-buildpacks/java-native-image</buildpack>
-              <buildpack>gcr.io/paketo-buildpacks/image-labels</buildpack>
-            </buildpacks>
             <env>
               <BP_JVM_VERSION>17.0.6</BP_JVM_VERSION>
               <BP_OCI_SOURCE>https://github.com/bcgov/nr-arch-choreography-saga/</BP_OCI_SOURCE>
