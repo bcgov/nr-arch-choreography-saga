@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,6 +30,8 @@ public class PermitService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<Permit, Event> createPermit(Permit permit) throws JsonProcessingException {
+    permit.setCreatedAt(LocalDateTime.now());
+    permit.setUpdatedAt(LocalDateTime.now());
     var savedEntity = permitRepo.save(permit);
     var eventEntity = createEvent("PERMIT_CREATED", savedEntity);
     val savedEvent = eventRepository.save(eventEntity);
@@ -44,6 +47,7 @@ public class PermitService {
       permitToUpdate.setPermitType(permit.getPermitType());
       permitToUpdate.setPermitArea(permit.getPermitArea());
       permitToUpdate.setPermitLatLong(permit.getPermitLatLong());
+      permitToUpdate.setUpdatedAt(LocalDateTime.now());
       val savedPermit = permitRepo.save(permitToUpdate);
       var eventEntity = createEvent("PERMIT_UPDATED", savedPermit);
       val savedEvent = eventRepository.save(eventEntity);
@@ -59,6 +63,8 @@ public class PermitService {
     eventEntity.setSource("PERMIT_API");
     eventEntity.setCreatedBy(permit.getCreatedBy());
     eventEntity.setUpdatedBy(permit.getUpdatedBy());
+    eventEntity.setCreatedAt(permit.getCreatedAt());
+    eventEntity.setUpdatedAt(permit.getUpdatedAt());
     eventEntity.setSubject("EVENTS-TOPIC");
     eventEntity.setPayloadVersion("1");
     eventEntity.setData(JsonUtil.getJsonStringFromObject(permit));
