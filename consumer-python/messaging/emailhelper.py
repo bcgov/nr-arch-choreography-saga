@@ -10,7 +10,6 @@ AUTH_URL = os.getenv('AUTH_URL')
 
 
 def get_ches_token():
-
     """Get CHES Token"""
     _auth_response = None
     try:
@@ -36,7 +35,6 @@ def get_ches_token():
 
 
 def check_ches_health():
-
     """Returns health checks of external service dependencies"""
     _access_token = get_ches_token()
     ches_headers = {
@@ -68,14 +66,15 @@ def send_email(message):
     to_email = "omprakash.2.mishra@gov.bc.ca"
     if _access_token is not None:
         from_email = "omprakash.2.mishra@gov.bc.ca"
-        ches_payload = "{\n \"bodyType\": \"html\",\n \"body\": \""+message+"\",\n \"delayTS\": 0,\n \"encoding\": \"utf-8\",\n \"from\": \""+from_email+"\",\n \"priority\": \"normal\",\n  \"subject\": \""+subject+"\",\n  \"to\": [\""+to_email+"\"]\n }\n"
+        ches_payload = "{\n \"bodyType\": \"html\",\n \"body\": \"" + message + "\",\n \"delayTS\": 0,\n \"encoding\": \"utf-8\",\n \"from\": \"" + from_email + "\",\n \"priority\": \"normal\",\n  \"subject\": \"" + subject + "\",\n  \"to\": [\"" + to_email + "\"]\n }\n"
         ches_headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + _access_token
         }
         _ches_api_single_email_endpoint = CHES_URL + '/api/v1/email'
         try:
-            _ches_response = requests.request("POST", _ches_api_single_email_endpoint, headers=ches_headers, data=ches_payload, timeout=5) # timeout in seconds
+            _ches_response = requests.request("POST", _ches_api_single_email_endpoint, headers=ches_headers,
+                                              data=ches_payload, timeout=5)  # timeout in seconds
         except Timeout:
             logging.error('The request timed out to send email! - %s', _ches_api_single_email_endpoint)
     return _ches_response
