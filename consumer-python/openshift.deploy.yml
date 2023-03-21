@@ -93,6 +93,12 @@ objects:
               env:
                 - name: NATS_URL
                   value: nats://nats:4222
+                - name: CHES_URL
+                  value: placeholder
+                - name: CHES_API_OAUTH_SECRET
+                  value: placeholder
+                - name: AUTH_URL
+                  value: placeholder
               ports:
                 - containerPort: 3000
                   protocol: TCP
