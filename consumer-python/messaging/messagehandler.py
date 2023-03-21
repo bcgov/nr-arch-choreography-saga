@@ -28,5 +28,5 @@ class MessageHandler:
 
     async def qsub_b(self, msg):
         print("QSUB B:", msg)
-        send_email(msg.data)
+        send_email(msg.data.decode("utf-8"))
         await msg.ack()
