@@ -3,7 +3,7 @@ import os
 import nats
 from nats.js.api import DeliverPolicy
 
-from messaging.emailhelper import send_email
+from app.messaging.emailhelper import send_email
 
 
 class MessageHandler:
