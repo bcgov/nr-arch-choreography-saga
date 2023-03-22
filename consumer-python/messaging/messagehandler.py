@@ -3,7 +3,6 @@ import os
 import nats
 from nats.js.api import DeliverPolicy
 
-from app.messaging.emailhelper import send_email
 
 
 class MessageHandler:
@@ -28,5 +27,4 @@ class MessageHandler:
 
     async def qsub_b(self, msg):
         print("QSUB B:", msg)
-        send_email(msg.data.decode("utf-8"))
         await msg.ack()
