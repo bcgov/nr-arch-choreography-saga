@@ -15,6 +15,7 @@ export default defineComponent({
     const {proxy} = getCurrentInstance() as ComponentInternalInstance;
     setTimeout(() => {
       if (proxy == null) return;
+      // @ts-ignore
       proxy.$connect();
     }, 100);
   }
