@@ -5,11 +5,11 @@ webSocketsService.install = function (Vue, options) {
   let reconnectInterval = options.reconnectInterval || 1000;
 
   Vue.$webSocketsConnect = () => {
-    const token =localStorage.getItem('jwtToken');
-    if(!token){
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
       return;
     }
-    if(ws && ws.readyState === WebSocket.OPEN){
+    if (ws && ws.readyState === WebSocket.OPEN) {
       return;
     }
     ws = new WebSocket(options.url);
@@ -19,12 +19,12 @@ webSocketsService.install = function (Vue, options) {
       reconnectInterval = options.reconnectInterval || 1000;
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       // New message from the backend - use JSON.parse(event.data)
       handleNotification(event);
     };
 
-    ws.onclose = (event) => {
+    ws.onclose = event => {
       if (event) {
         // Event.code 1000 is our normal close event
         if (event.code !== 1000) {
@@ -40,7 +40,7 @@ webSocketsService.install = function (Vue, options) {
       }
     };
 
-    ws.onerror = (error) => {
+    ws.onerror = error => {
       console.log(error);
       ws.close();
     };
@@ -51,14 +51,17 @@ webSocketsService.install = function (Vue, options) {
     ws?.close();
   };
 
-  Vue.$webSocketsSend = (data) => {
+  Vue.$webSocketsSend = data => {
     // Send data to the backend - use JSON.stringify(data)
     ws.send(JSON.stringify(data));
   };
   /*
     Here we write our custom functions to not make a mess in one function
   */
-  function handleNotification (params) {
+  /**
+   *
+   */
+  function handleNotification(params) {
     options.store.dispatch('notifications/setNotification', params.data);
   }
 };

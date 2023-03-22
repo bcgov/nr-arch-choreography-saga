@@ -145,7 +145,8 @@ objects:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
     spec:
-      host: ${NAME}-${ZONE}-frontend.${DOMAIN}/api
+      host: ${NAME}-${ZONE}-frontend.${DOMAIN}
+      path: /api
       port:
         targetPort: 3000-tcp
       to:

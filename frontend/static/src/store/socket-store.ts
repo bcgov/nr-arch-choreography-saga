@@ -1,29 +1,29 @@
-import { defineStore } from "pinia";
-import store from "@/store";
+import { defineStore } from 'pinia';
+import store from '@/store';
 import main from '@/main';
-import type { SocketStore } from "@/type/pinia-types";
+import type { SocketStore } from '@/type/pinia-types';
 
 export const useSocketStore = defineStore({
-  id: "socket",
+  id: 'socket',
   state: (): SocketStore => ({
     isConnected: false,
-    message: "",
+    message: '',
     reconnectError: false,
     heartBeatInterval: 50000,
-    heartBeatTimer: 0
+    heartBeatTimer: 0,
   }),
   actions: {
     SOCKET_ONOPEN(event: any) {
-      console.log("successful websocket connection");
+      console.log('successful websocket connection');
       main.config.globalProperties.$socket = event.currentTarget;
       this.isConnected = true;
       this.heartBeatTimer = window.setInterval(() => {
-        const message = "heart beat";
+        const message = 'heart beat';
         this.isConnected &&
-        main.config.globalProperties.$socket.sendObj({
-          code: 200,
-          msg: message
-        });
+          main.config.globalProperties.$socket.sendObj({
+            code: 200,
+            msg: message,
+          });
       }, this.heartBeatInterval);
     },
     SOCKET_ONCLOSE(event: any) {
@@ -36,19 +36,22 @@ export const useSocketStore = defineStore({
       console.error(event);
     },
     SOCKET_ONMESSAGE(message: any) {
-      console.info("message", message);
+      console.info('message', message);
       this.message = message;
     },
     SOCKET_RECONNECT(count: any) {
-      console.info("count", count);
+      console.info('count', count);
     },
     SOCKET_RECONNECT_ERROR() {
       this.reconnectError = true;
-    }
-  }
+    },
+  },
 });
 
 // Need to be used outside the setup
+/**
+ *
+ */
 export function useSocketStoreWithOut() {
   return useSocketStore(store);
 }
