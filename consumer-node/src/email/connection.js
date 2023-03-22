@@ -1,6 +1,6 @@
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
-const {tokenProvider} = require('axios-token-interceptor');
+const tokenProvider = require('axios-token-interceptor');
 
 class ClientConnection {
 
@@ -15,16 +15,12 @@ class ClientConnection {
 
     this.axios = axios.create();
     this.clientCreds = oauth.clientCredentials(axios.create(), this.tokenUrl, clientId, clientSecret);
-    this.axios.interceptors.request.use(async config => {
-      const auth = await this.clientCreds('');
-      config.headers = {
-        'Authorization': `Bearer ${auth.access_token}`,
-        'Accept': 'application/json',
-      };
-      return config;
-    }, error => {
-      Promise.reject(error);
-    });
+    this.axios.interceptors.request.use(tokenProvider({
+      getToken: async () => {
+        const data = await this.clientCreds('');
+        return data.access_token;
+      },
+    }));
   }
 }
 
