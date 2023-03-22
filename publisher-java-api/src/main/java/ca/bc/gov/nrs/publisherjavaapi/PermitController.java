@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.publisherjavaapi;
 
 import ca.bc.gov.nrs.publisherjavaapi.messaging.jetstream.Publisher;
 import ca.bc.gov.nrs.publisherjavaapi.model.Permit;
+import ca.bc.gov.nrs.publisherjavaapi.model.PermitStatus;
 import ca.bc.gov.nrs.publisherjavaapi.service.PermitService;
 import ca.bc.gov.nrs.publisherjavaapi.service.SearchService;
 import ca.bc.gov.nrs.publisherjavaapi.util.JsonUtil;
@@ -68,7 +69,7 @@ public class PermitController {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt, String permitLatLong) {
+  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt, String permitLatLong, PermitStatus permitStatus) {
 
     public static Permit toPermit(PermitDTO permitDTO) {
       Permit permit = new Permit();
@@ -78,12 +79,13 @@ public class PermitController {
       permit.setCreatedBy(permitDTO.createdBy());
       permit.setUpdatedBy(permitDTO.updatedBy());
       permit.setPermitLatLong(permitDTO.permitLatLong());
+      permit.setPermitStatus(permitDTO.permitStatus());
       return permit;
     }
 
 
     public static PermitDTO toDTO(Permit permit) {
-      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy(), permit.getCreatedAt(), permit.getUpdatedAt(), permit.getPermitLatLong());
+      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy(), permit.getCreatedAt(), permit.getUpdatedAt(), permit.getPermitLatLong(), permit.getPermitStatus());
     }
   }
 }
