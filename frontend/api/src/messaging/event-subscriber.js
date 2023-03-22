@@ -12,9 +12,6 @@ const handleJetStreamMessage = async (err, msg) => {
   }
   try {
     const data = JSON.parse(StringCodec().decode(msg.data)); // it would always be a JSON string. ii will always be choreographed event.
-    logger.info(`Received message, on ${msg.subject} , Sequence ::  [${msg.seq}], sid ::  [${msg.sid}], redelivered ::  [${msg.redelivered}] :: Data ::`, data);
-    logger.info(data);
-
     msg.ack(); // acknowledge to JetStream
   } catch (e) {
     logger.error('Error while handling data from event', e);

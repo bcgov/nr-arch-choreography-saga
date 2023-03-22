@@ -54,7 +54,6 @@ const subscribe = () => {
     let sub = await jetStream.subscribe(key, opts);
     const done = (async () => {
       for await (const m of sub) {
-        logger.info(`Received message, on ${m.subject} , Sequence ::  [${m.seq}], sid ::  [${m.sid}], redelivered ::  [${m.redelivered}] :: Data ::`, m.data);
         await handleJetStreamMessage(null, m);
         m.ack();
       }
