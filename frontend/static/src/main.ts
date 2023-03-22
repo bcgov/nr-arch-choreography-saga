@@ -22,7 +22,7 @@ const socketStoreWithOut = useSocketStoreWithOut();
 const vue = createApp(App);
 vue.use(
   vuenativesocket,
-  `wss://${window.location.hostname}'/api/socket`, // 'ws://localhost:3000/api/socket'
+  `wss://${window.location.hostname}/api/socket`, // 'ws://localhost:3000/api/socket'
   {
     store: socketStoreWithOut,
     format: "json",
