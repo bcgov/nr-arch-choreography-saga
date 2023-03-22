@@ -2,6 +2,7 @@
 const TOPICS = ['EVENTS-TOPIC'];
 const logger = require('../logger');
 const NATS = require('./nats-con');
+const emailHelper = require('../email');
 const {AckPolicy, DeliverPolicy, StringCodec, createInbox, consumerOpts} = require('nats');
 
 
@@ -11,10 +12,20 @@ const handleJetStreamMessage = async (err, msg) => {
     return;
   }
   try {
-    const data = JSON.parse(StringCodec().decode(msg.data)); // it would always be a JSON string. ii will always be choreographed event.
+    const data = JSON.parse(StringCodec().decode(msg.data)); // it would always be a JSON string. it will always be choreographed event.
     logger.info(`Received message, on ${msg.subject} , Sequence ::  [${msg.seq}], sid ::  [${msg.sid}], redelivered ::  [${msg.redelivered}] :: Data ::`, data);
-    logger.info(data);
+    const email = {
+      bodyType: 'html',
+      body: StringCodec().decode(msg.data),
+      delayTS: 0,
+      encoding: 'utf-8',
+      from: 'omprakash.2.mishra@gov.bc.ca',
+      priority: 'normal',
+      subject: 'Event Received',
+      to: ['omprakash.2.mishra@gov.bc.ca']
+    };
 
+    await emailHelper.send(email);
     msg.ack(); // acknowledge to JetStream
   } catch (e) {
     logger.error('Error while handling data from event', e);
@@ -32,7 +43,7 @@ const subscribe = () => {
       name: 'consumer-node-api'
     };
     const opts = consumerOpts(config);
-    opts.stream='EVENTS';
+    opts.stream = 'EVENTS';
     opts.durable('consumer-node-api');
     opts.manualAck();
     opts.ackExplicit();
