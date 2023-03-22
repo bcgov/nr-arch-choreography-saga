@@ -6,6 +6,40 @@ const emailHelper = require('../email');
 const {AckPolicy, DeliverPolicy, StringCodec, createInbox, consumerOpts} = require('nats');
 
 
+function generateHtmlBody(data) {
+  return `<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSON Data Table</title>
+    <style>
+      table,
+      th,
+      td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+        ${Object.keys(data).map((key) => `<th>${key}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+         ${Object.values(data).map((value) => `<td>${value}</td>`).join('')}
+        </tr>
+        
+      </tbody>
+    </table>
+  </body>
+</html>
+`;
+}
+
 const handleJetStreamMessage = async (err, msg) => {
   if (err) {
     logger.error(err);
@@ -16,7 +50,7 @@ const handleJetStreamMessage = async (err, msg) => {
     logger.info(`Received message, on ${msg.subject} , Sequence ::  [${msg.seq}], sid ::  [${msg.sid}], redelivered ::  [${msg.redelivered}] :: Data ::`, data);
     const email = {
       bodyType: 'html',
-      body: StringCodec().decode(msg.data),
+      body: generateHtmlBody(data),
       delayTS: 0,
       encoding: 'utf-8',
       from: 'omprakash.2.mishra@gov.bc.ca',
@@ -26,6 +60,7 @@ const handleJetStreamMessage = async (err, msg) => {
     };
 
     await emailHelper.send(email);
+    logger.info('Email sent successfully');
     msg.ack(); // acknowledge to JetStream
   } catch (e) {
     logger.error('Error while handling data from event', e);
