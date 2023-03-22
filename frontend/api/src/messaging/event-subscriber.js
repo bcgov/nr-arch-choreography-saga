@@ -3,6 +3,7 @@ const TOPICS = ['EVENTS-TOPIC'];
 const logger = require('../logger');
 const NATS = require('./nats-con');
 const {StringCodec, createInbox, consumerOpts, AckPolicy, DeliverPolicy} = require('nats');
+const webSocket = require('../socket/socket');
 
 
 const handleJetStreamMessage = async (err, msg) => {
@@ -11,7 +12,7 @@ const handleJetStreamMessage = async (err, msg) => {
     return;
   }
   try {
-    const data = JSON.parse(StringCodec().decode(msg.data)); // it would always be a JSON string. ii will always be choreographed event.
+    broadCastMessageToWebSocketClients(StringCodec().decode(msg.data));
     msg.ack(); // acknowledge to JetStream
   } catch (e) {
     logger.error('Error while handling data from event', e);
@@ -48,6 +49,18 @@ const subscribe = () => {
   });
 
 };
+function broadCastMessageToWebSocketClients(msg) {
+  const connectedClients = webSocket.getWebSocketClients();
+  if (connectedClients && connectedClients.length > 0) {
+    for (const connectedClient of connectedClients) {
+      try {
+        connectedClient.send(msg);
+      } catch (e) {
+        logger.error(`Error while sending message to connected client ${connectedClient} :: ${e}`);
+      }
+    }
+  }
+}
 module.exports = {
   subscribe
 };

@@ -45,6 +45,7 @@
     "pinia": "^2.0.33",
     "pinia-plugin-persistedstate": "^3.1.0",
     "vue": "^3.2.47",
+    "vue-native-websocket-vue3": "^3.1.7",
     "vue-router": "^4.1.6",
     "vuetify": "^3.1.11",
     "webfontloader": "^1.6.28"

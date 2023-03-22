@@ -36,6 +36,6 @@ export default defineStore('config', {
   // Data persistence destination
   persist: {
     key: import.meta.env.VITE_APP_WEBSTORAGE_NAMESPACE || 'vuetify',
-    storage: window.sessionStorage,
+    storage: window.localStorage,
   },
 });

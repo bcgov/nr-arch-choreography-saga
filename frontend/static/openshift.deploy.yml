@@ -89,7 +89,7 @@ objects:
               name: ${NAME}
               env:
                 - name: BACKEND_URL
-                  value: https://${NAME}-${ZONE}-frontend-api.${DOMAIN}
+                  value: https://${NAME}-${ZONE}-frontend.${DOMAIN}/api
               ports:
                 - containerPort: 3000
                   protocol: TCP
@@ -139,7 +139,7 @@ objects:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
     spec:
-      host: ${NAME}-${ZONE}-${COMPONENT}.${DOMAIN}
+      host: ${NAME}-${ZONE}-frontend.${DOMAIN}
       port:
         targetPort: 3000-tcp
       to:

@@ -14,7 +14,8 @@
     "morgan": "^1.10.0",
     "nats": "^2.12.1",
     "nocache": "^2.1.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "express-ws": "^5.0.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
