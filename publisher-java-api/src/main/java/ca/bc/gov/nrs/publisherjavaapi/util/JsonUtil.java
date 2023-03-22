@@ -14,6 +14,7 @@ public class JsonUtil {
   public static final ObjectMapper mapper = new ObjectMapper();
   static {
     mapper.registerModule(new JavaTimeModule());
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
   private JsonUtil() {

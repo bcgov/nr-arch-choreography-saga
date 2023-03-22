@@ -93,7 +93,9 @@ objects:
               env:
                 - name: NATS_URL
                   value: nats://nats:4222
-
+              envFrom:
+                - configMapRef:
+                    name: "consumer-node-config"
               ports:
                 - containerPort: 3000
                   protocol: TCP
