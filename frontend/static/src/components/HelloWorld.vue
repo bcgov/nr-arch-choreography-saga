@@ -1,93 +1,78 @@
-<script setup lang="ts">
-import { createVuetify } from 'vuetify';
-import Meta from '@/Meta';
-
-/** Props */
+<script setup lang="ts">/** Props */
 defineProps<{
   msg: string;
 }>();
+// @ts-ignore
+import {useSocketStore} from '../store';
+
+const socketStore = useSocketStore();
 </script>
 
+<script lang="ts">
+import {
+  getCurrentInstance,
+  defineComponent,
+  type ComponentInternalInstance,
+} from 'vue';
+
+export default defineComponent({
+  name: 'HelloWorld',
+  mounted() {
+    const {proxy} = getCurrentInstance() as ComponentInternalInstance;
+    setTimeout(() => {
+      if (proxy == null) return;
+      // @ts-ignore
+      proxy.$connect();
+    }, 100);
+  },
+  data() {
+    return {
+      headers: ['id', 'type', 'source', 'payloadVersion', 'data', 'subject', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt'],
+      items: [],
+    }
+  }
+});
+</script>
 <template>
-  <v-container class="fill-height">
-    <v-responsive class="d-flex align-center text-center fill-height">
-      <v-img
-        src="@/assets/bc-gov-logo.svg"
-        alt="vuetify"
-        :width="256"
-        class="logo mx-auto"
-      />
-      <h1 class="text-h2 font-weight-bold mb-3">
-        Welcome to the Vuetify
-        {{ 'v' + createVuetify.version }}
-      </h1>
-      <p>{{ msg }}</p>
-      <p class="text-medium-emphasis">
-        <a
-          href="https://github.com/logue/vite-vuetify-ts-starter"
-          target="_blank"
-        >
-          vite-vuetify-ts-starter
-        </a>
-        &nbsp;/&nbsp;Build:
-        <time
-          :datetime="Meta.date"
-          v-text="new Date(Meta.date).toLocaleString()"
-        />
-      </p>
-      <div class="py-10" />
-      <v-row class="d-flex align-center justify-center">
-        <v-col cols="auto">
-          <v-btn
-            href="https://next.vuetifyjs.com/components/all/"
-            min-width="164"
-            rel="noopener noreferrer"
-            target="_blank"
-            variant="text"
-          >
-            <v-icon icon="mdi-view-dashboard" size="large" start />
+  <v-container class="fill-height" style="display: flex; align-items: center; justify-content: center;">
+    <table v-if="socketStore.getMessages.length > 0">
+      <thead>
+      <th v-for="key in Object.keys(socketStore.getMessages[0])" v-bind:key="key">{{ key }}</th>
+      </thead>
+      <tbody>
+      <tr v-for="data in socketStore.getMessages" v-bind:key="data">
+        <td v-for="cell in Object.values(data)" v-bind:key="cell">{{ cell }}</td>
+      </tr>
 
-            Components
-          </v-btn>
-        </v-col>
-
-        <v-col cols="auto">
-          <v-btn
-            color="primary"
-            href="https://next.vuetifyjs.com/introduction/why-vuetify/#feature-guides"
-            min-width="228"
-            rel="noopener noreferrer"
-            size="x-large"
-            target="_blank"
-            variant="flat"
-          >
-            <v-icon icon="mdi-speedometer" size="large" start />
-
-            Get Started
-          </v-btn>
-        </v-col>
-
-        <v-col cols="auto">
-          <v-btn
-            href="https://community.vuetifyjs.com/"
-            min-width="164"
-            rel="noopener noreferrer"
-            target="_blank"
-            variant="text"
-          >
-            <v-icon icon="mdi-account-group" size="large" start />
-
-            Community
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-responsive>
+      </tbody>
+    </table>
   </v-container>
 </template>
 
 <style scoped>
-.logo:hover {
-  will-change: filter;
-  filter: drop-shadow(0 0 1em #2196f3aa);
+table {
+  border-collapse: collapse;
+  width: 80%;
+  border: 0.5px solid #ccc;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 2px;
+  color: #333;
+  border-right: 0.5px solid #ccc;
+}
+th:last-child,
+td:last-child {
+  border-right: none;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:not(:last-child) {
+  border-bottom: 2px solid #ddd;
 }
 </style>

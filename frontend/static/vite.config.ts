@@ -45,6 +45,12 @@ export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
     ],
     // https://vitejs.dev/config/server-options.html
     server: {
+      port: 5173,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+        },
+      },
       fs: {
         // Allow serving files from one level up to the project root
         allow: ['..'],

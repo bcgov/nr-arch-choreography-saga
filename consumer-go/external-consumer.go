@@ -57,9 +57,9 @@ func externalConsumerMessageHandler(msg *nats.Msg) {
 	req.SetRequestURI(getEnv("EXTERNAL_CONSUMER_API_URL", "http://localhost:8080/external-api/"))
 	req.Header.SetMethod("POST")
 	req.Header.SetContentType("application/json")
-	req.Header.Add("X_API_KEY", getEnv("EXTERNAL_CONSUMER_API_KEY", "API_KEY"))
+	req.Header.Add(getEnv("EXTERNAL_CONSUMER_API_KEY_NAME", "x-api-key"), getEnv("EXTERNAL_CONSUMER_API_KEY_VALUE", ""))
 	req.SetBody(msg.Data)
-
+	logrus.Infof("Calling external API on URL: %s", getEnv("EXTERNAL_CONSUMER_API_URL", "http://localhost:8080/external-api/"))
 	err := client.Do(req, res)
 	if err != nil {
 		logrus.Error(err)
@@ -71,6 +71,6 @@ func externalConsumerMessageHandler(msg *nats.Msg) {
 		return
 	}
 	bodyBytes := res.Body()
-	logrus.Info(string(bodyBytes))
+	logrus.Infof("got response from API call, data[%s]", string(bodyBytes))
 	msg.Ack()
 }

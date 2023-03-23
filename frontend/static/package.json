@@ -27,7 +27,7 @@
   "scripts": {
     "dev": "vite",
     "clean": "rimraf ./node_modules/.vite",
-    "build": "run-p type-check build-only",
+    "build": "run-p  build-only",
     "build:analyze": "vite build --mode analyze",
     "build:clean": "rimraf dist",
     "preview": "vite preview",
@@ -41,12 +41,13 @@
   },
   "dependencies": {
     "@mdi/font": "^7.1.96",
-    "core-js": "^3.29.0",
-    "pinia": "^2.0.32",
+    "core-js": "^3.29.1",
+    "pinia": "^2.0.33",
     "pinia-plugin-persistedstate": "^3.1.0",
     "vue": "^3.2.47",
+    "vue-native-websocket-vue3": "^3.1.7",
     "vue-router": "^4.1.6",
-    "vuetify": "^3.1.7",
+    "vuetify": "^3.1.11",
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {

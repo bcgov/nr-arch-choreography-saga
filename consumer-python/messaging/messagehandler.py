@@ -4,6 +4,7 @@ import nats
 from nats.js.api import DeliverPolicy
 
 
+
 class MessageHandler:
     """
         This class handles connection nats jetstream and does push subscription.

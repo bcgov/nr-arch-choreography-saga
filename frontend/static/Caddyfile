@@ -32,5 +32,5 @@
         Referrer-Policy "same-origin"
         Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
     }
-    reverse_proxy {$BACKEND_URL}
+    reverse_proxy /api/* {$BACKEND_URL}
 }

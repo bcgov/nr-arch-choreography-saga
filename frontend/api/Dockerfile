@@ -23,5 +23,5 @@ RUN adduser -D app
 USER app
 
 # Start up command
-HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000/api
 ENTRYPOINT ["node", "src/server"]

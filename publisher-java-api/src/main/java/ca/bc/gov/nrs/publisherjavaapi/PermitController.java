@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.publisherjavaapi;
 
 import ca.bc.gov.nrs.publisherjavaapi.messaging.jetstream.Publisher;
 import ca.bc.gov.nrs.publisherjavaapi.model.Permit;
+import ca.bc.gov.nrs.publisherjavaapi.model.PermitStatus;
 import ca.bc.gov.nrs.publisherjavaapi.service.PermitService;
 import ca.bc.gov.nrs.publisherjavaapi.service.SearchService;
 import ca.bc.gov.nrs.publisherjavaapi.util.JsonUtil;
@@ -11,13 +12,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.JetStreamApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,6 +36,7 @@ public class PermitController {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   @PostMapping
+  @Transactional
   public PermitDTO createPermit(@Validated @RequestBody PermitDTO permitDTO) throws JetStreamApiException, IOException {
     var permitPair = permitService.createPermit(PermitDTO.toPermit(permitDTO));
     publisher.publish(JsonUtil.getJsonStringFromObject(permitPair.getSecond()));
@@ -41,6 +45,7 @@ public class PermitController {
   }
 
   @PutMapping
+  @Transactional
   public PermitDTO updatePermit(@Validated @RequestBody PermitDTO permitDTO) throws IOException, JetStreamApiException {
     val permitPair = permitService.updatePermit(PermitDTO.toPermit(permitDTO));
     publisher.publish(JsonUtil.getJsonStringFromObject(permitPair.getSecond()));
@@ -49,10 +54,11 @@ public class PermitController {
   }
 
   @GetMapping("/paginated")
+  @Transactional(readOnly = true, propagation = Propagation.REQUIRED, timeout = 30) //timeout in seconds
   public ResponseEntity<?> getPermits(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                       @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
-                                      @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson) throws IOException {
+                                      @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson) {
     if (pageSize > 2000) {
       return ResponseEntity.badRequest().body("Page size cannot be greater than 2000");
     }
@@ -63,7 +69,7 @@ public class PermitController {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy) {
+  public record PermitDTO(UUID permitId, String permitType, String permitArea, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt, String permitLatLong, PermitStatus permitStatus) {
 
     public static Permit toPermit(PermitDTO permitDTO) {
       Permit permit = new Permit();
@@ -72,11 +78,14 @@ public class PermitController {
       permit.setPermitArea(permitDTO.permitArea());
       permit.setCreatedBy(permitDTO.createdBy());
       permit.setUpdatedBy(permitDTO.updatedBy());
+      permit.setPermitLatLong(permitDTO.permitLatLong());
+      permit.setPermitStatus(permitDTO.permitStatus());
       return permit;
     }
 
+
     public static PermitDTO toDTO(Permit permit) {
-      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy());
+      return new PermitDTO(permit.getPermitId(), permit.getPermitType(), permit.getPermitArea(), permit.getCreatedBy(), permit.getUpdatedBy(), permit.getCreatedAt(), permit.getUpdatedAt(), permit.getPermitLatLong(), permit.getPermitStatus());
     }
   }
 }

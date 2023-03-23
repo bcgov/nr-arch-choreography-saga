@@ -95,36 +95,45 @@ jobs:
             file: consumer-go/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
+            verification_path: ''
           - name: consumer-rust
             file: consumer-rust/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
+            verification_path: ''
           - name: publisher-java-api
             file: publisher-java-api/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
+            verification_path: ''
           - name: consumer-node
             file: consumer-node/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
+            verification_path: ''
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
+            verification_path: ''
           - name: frontend-api
             file: frontend/api/openshift.deploy.yml
+            verification_path: /api
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
           - name: consumer-python
             file: consumer-python/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
+            verification_path: ''
           - name: frontend-static
             file: frontend/static/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=1
+            verification_path: ''
           - name: init
             file: common/openshift.init.yml
             overwrite: false
+            verification_path: ''
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.0.2
         with:
@@ -133,6 +142,7 @@ jobs:
           oc_server: ${{ secrets.OC_SERVER }}
           oc_token: ${{ secrets.OC_TOKEN }}
           overwrite: ${{ matrix.overwrite }}
+          verification_path: ${{ matrix.verification_path }}
           penetration_test: false
           parameters:
             -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}

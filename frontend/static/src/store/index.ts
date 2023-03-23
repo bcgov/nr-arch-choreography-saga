@@ -11,5 +11,5 @@ export default pinia;
 
 import useGlobal from './GlobalStore';
 import useConfig from './ConfigStore';
-
-export { useConfig, useGlobal };
+import useSocketStore from './socket-store';
+export { useConfig, useGlobal, useSocketStore };

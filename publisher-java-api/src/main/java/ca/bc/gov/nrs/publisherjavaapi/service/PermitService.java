@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,10 +30,12 @@ public class PermitService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<Permit, Event> createPermit(Permit permit) throws JsonProcessingException {
+    permit.setCreatedAt(LocalDateTime.now());
+    permit.setUpdatedAt(LocalDateTime.now());
     var savedEntity = permitRepo.save(permit);
-    var eventEntity = createEvent("PERMIT_CREATED", permit, savedEntity);
-    eventRepository.save(eventEntity);
-    return Pair.of(savedEntity, eventEntity);
+    var eventEntity = createEvent("PERMIT_CREATED", savedEntity);
+    val savedEvent = eventRepository.save(eventEntity);
+    return Pair.of(savedEntity, savedEvent);
   }
 
 
@@ -43,25 +46,28 @@ public class PermitService {
       val permitToUpdate = existingPermit.get();
       permitToUpdate.setPermitType(permit.getPermitType());
       permitToUpdate.setPermitArea(permit.getPermitArea());
-
-      var eventEntity = createEvent("PERMIT_UPDATED", permit, permitToUpdate);
-      permitRepo.save(permitToUpdate);
-      eventRepository.save(eventEntity);
-      return Pair.of(permitToUpdate, eventEntity);
+      permitToUpdate.setPermitLatLong(permit.getPermitLatLong());
+      permitToUpdate.setUpdatedAt(LocalDateTime.now());
+      val savedPermit = permitRepo.save(permitToUpdate);
+      var eventEntity = createEvent("PERMIT_UPDATED", savedPermit);
+      val savedEvent = eventRepository.save(eventEntity);
+      return Pair.of(permitToUpdate, savedEvent);
     } else {
       throw new EntityNotFoundException("Permit not found");
     }
   }
 
-  private static Event createEvent(String type, Permit permit, Permit savedEntity) throws JsonProcessingException {
+  private static Event createEvent(String type, Permit permit) throws JsonProcessingException {
     Event eventEntity = new Event();
     eventEntity.setType(type);
     eventEntity.setSource("PERMIT_API");
     eventEntity.setCreatedBy(permit.getCreatedBy());
     eventEntity.setUpdatedBy(permit.getUpdatedBy());
+    eventEntity.setCreatedAt(permit.getCreatedAt());
+    eventEntity.setUpdatedAt(permit.getUpdatedAt());
     eventEntity.setSubject("EVENTS-TOPIC");
     eventEntity.setPayloadVersion("1");
-    eventEntity.setData(JsonUtil.getJsonStringFromObject(savedEntity));
+    eventEntity.setData(JsonUtil.getJsonStringFromObject(permit));
     return eventEntity;
   }
 

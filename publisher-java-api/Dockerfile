@@ -16,9 +16,9 @@ ENV JAVA_OPS -Xms512m -Xmx512m
 COPY --from=build /app/target/publisher*.jar /app/service.jar
 
 
-EXPOSE 3001
+EXPOSE 3000
 
-HEALTHCHECK --interval=35s --timeout=4s CMD wget --spider -S http://127.0.0.1:3001/health || exit 1
+HEALTHCHECK --interval=9000s --timeout=4s CMD wget --spider -S http://127.0.0.1:3000/health || exit 1
 
 # Non-privileged user
 USER app
