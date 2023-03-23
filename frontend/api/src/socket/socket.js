@@ -16,7 +16,6 @@ const webSocket = {
       ws.on('message', function (msg) {
         logger.info('received: %s', msg);
       });
-      ws.send('{"message":"hello"}');
     });
   },
   getWebSocketClients() {

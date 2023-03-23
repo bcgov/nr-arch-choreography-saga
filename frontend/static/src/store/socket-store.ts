@@ -1,13 +1,13 @@
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
 import store from '@/store';
 import main from '@/main';
-import type { SocketStore } from '@/type/pinia-types';
+import type {SocketStore} from '@/type/pinia-types';
 
-export const useSocketStore = defineStore({
+const useSocketStore = defineStore({
   id: 'socket',
   state: (): SocketStore => ({
     isConnected: false,
-    message: '',
+    messages: [],
     reconnectError: false,
     heartBeatInterval: 50000,
     heartBeatTimer: 0,
@@ -20,10 +20,10 @@ export const useSocketStore = defineStore({
       this.heartBeatTimer = window.setInterval(() => {
         const message = 'heart beat';
         this.isConnected &&
-          main.config.globalProperties.$socket.sendObj({
-            code: 200,
-            msg: message,
-          });
+        main.config.globalProperties.$socket.sendObj({
+          code: 200,
+          msg: message,
+        });
       }, this.heartBeatInterval);
     },
     SOCKET_ONCLOSE(event: any) {
@@ -37,7 +37,7 @@ export const useSocketStore = defineStore({
     },
     SOCKET_ONMESSAGE(message: any) {
       console.info('message', message);
-      this.message = message;
+      this.messages.push(message);
     },
     SOCKET_RECONNECT(count: any) {
       console.info('count', count);
@@ -46,6 +46,11 @@ export const useSocketStore = defineStore({
       this.reconnectError = true;
     },
   },
+  getters: {
+    getMessages(state) {
+      return state.messages;
+    }
+  }
 });
 
 // Need to be used outside the setup
@@ -55,3 +60,5 @@ export const useSocketStore = defineStore({
 export function useSocketStoreWithOut() {
   return useSocketStore(store);
 }
+
+export default useSocketStore;

@@ -1,6 +1,6 @@
 export type SocketStore = {
   isConnected: boolean;
-  message: string;
+  messages: any;
   reconnectError: boolean;
   heartBeatInterval: number;
   heartBeatTimer: number;
