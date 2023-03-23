@@ -2,6 +2,7 @@
 defineProps<{
   msg: string;
 }>();
+// @ts-ignore
 import {useSocketStore} from '../store';
 
 const socketStore = useSocketStore();

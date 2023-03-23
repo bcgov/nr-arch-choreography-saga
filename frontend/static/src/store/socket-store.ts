@@ -1,7 +1,7 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
 import store from '@/store';
 import main from '@/main';
-import type {SocketStore} from '@/type/pinia-types';
+import type { SocketStore } from '@/type/pinia-types';
 
 const useSocketStore = defineStore({
   id: 'socket',
@@ -20,10 +20,10 @@ const useSocketStore = defineStore({
       this.heartBeatTimer = window.setInterval(() => {
         const message = 'heart beat';
         this.isConnected &&
-        main.config.globalProperties.$socket.sendObj({
-          code: 200,
-          msg: message,
-        });
+          main.config.globalProperties.$socket.sendObj({
+            code: 200,
+            msg: message,
+          });
       }, this.heartBeatInterval);
     },
     SOCKET_ONCLOSE(event: any) {
@@ -49,8 +49,8 @@ const useSocketStore = defineStore({
   getters: {
     getMessages(state) {
       return state.messages;
-    }
-  }
+    },
+  },
 });
 
 // Need to be used outside the setup

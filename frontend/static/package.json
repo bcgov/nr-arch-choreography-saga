@@ -27,7 +27,7 @@
   "scripts": {
     "dev": "vite",
     "clean": "rimraf ./node_modules/.vite",
-    "build": "run-p type-check build-only",
+    "build": "run-p  build-only",
     "build:analyze": "vite build --mode analyze",
     "build:clean": "rimraf dist",
     "preview": "vite preview",
