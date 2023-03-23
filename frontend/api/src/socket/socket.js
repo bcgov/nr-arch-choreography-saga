@@ -14,7 +14,7 @@ const webSocket = {
     app.ws('/api/socket', (ws) => {
       connectedClients.push(ws);
       ws.on('message', function (msg) {
-        logger.info('received: %s', msg);
+        logger.verbose('received:', msg);
       });
     });
   },
